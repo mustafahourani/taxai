@@ -2,9 +2,6 @@
 
 Privacy-preserving AI tax filing. Upload your W-2 and tax documents, get a completed IRS Form 1040 back. Your data is processed inside a hardware-encrypted enclave. Nobody sees it.
 
-**Live demo:** http://34.178.44.42:8000
-**Verification:** https://verify-sepolia.eigencloud.xyz/app/0xc757EC2cEB8a75d399E1C63C6284161522eD7a97
-
 ---
 
 ## What It Does
