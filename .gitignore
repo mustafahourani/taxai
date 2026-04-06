@@ -1,0 +1,7 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+form_1040_draft*.pdf
+*.DS_Store

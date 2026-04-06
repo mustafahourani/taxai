@@ -1,0 +1,31 @@
+{
+  "filing_status": "single",
+  "first_name": "Elizabeth A",
+  "last_name": "Darling",
+  "ssn": "***-**-1234",
+  "address": "2001 Campus Drive, Pittsburgh, PA 15237",
+  "dependents": [],
+  "w2s": [
+    {
+      "employer": "University of Pittsburgh",
+      "ein": "25-0965591",
+      "wages": 44629.35,
+      "federal_withheld": 7631.62,
+      "ss_wages": 48736.35,
+      "ss_withheld": 3021.65,
+      "medicare_wages": 48736.35,
+      "medicare_withheld": 706.68,
+      "state": "PA",
+      "state_wages": 47808.35,
+      "state_withheld": 1467.72
+    }
+  ],
+  "student_loan_interest": 1847.32,
+  "interest_income": 0,
+  "dividend_income": 0,
+  "other_income": 0,
+  "adjustments": 0,
+  "use_standard_deduction": true,
+  "itemized_deductions": 0,
+  "digital_assets": false
+}

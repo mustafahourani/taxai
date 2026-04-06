@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaxAI  - Private Tax Filing</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <header>
+    <h1>Tax<span>AI</span></h1>
+    <p>Generate your tax forms using AI with full end-to-end privacy.</p>
+  </header>
+
+  <!-- Step 1: Upload Documents -->
+  <div class="step active" id="step-1">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <h2>Upload Your Tax Documents</h2>
+    </div>
+
+    <p class="step-desc">Upload your W-2, 1098-E, 1099s, and other tax documents. Our AI will extract everything, compute your taxes, and generate your Form 1040  - all inside an encrypted enclave.</p>
+
+    <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()" ondragover="event.preventDefault(); this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleDrop(event)">
+      <div class="upload-icon">&#8593;</div>
+      <p class="upload-main">Drop your W-2, 1098-E, 1099s, and other tax documents here</p>
+      <p class="upload-sub">PDF, JPG, or PNG  - processed entirely inside the enclave</p>
+      <input type="file" id="file-input" accept=".pdf,.jpg,.jpeg,.png" multiple style="display:none" onchange="handleFiles(event)">
+    </div>
+
+    <div id="file-list" class="file-list hidden"></div>
+
+    <div class="demo-section">
+      <div class="section-divider"><span>or try with sample documents</span></div>
+      <div class="demo-docs">
+        <button type="button" class="demo-doc" id="demo-w2" onclick="addDemoDoc('w2')">
+          <div class="demo-doc-preview">
+            <div class="doc-page">
+              <div class="doc-header-bar"></div>
+              <div class="doc-form-id">W-2</div>
+              <div class="doc-year">2025</div>
+              <div class="doc-title-text">Wage and Tax<br>Statement</div>
+              <div class="doc-line"></div>
+              <div class="doc-line short"></div>
+              <div class="doc-line"></div>
+              <div class="doc-line short"></div>
+            </div>
+          </div>
+          <div class="demo-doc-info">
+            <div class="demo-doc-title">Sample W-2</div>
+            <div class="demo-doc-subtitle">Your employer's report of your wages and taxes withheld</div>
+          </div>
+          <div class="demo-doc-check hidden" id="check-w2">&#10003;</div>
+        </button>
+        <button type="button" class="demo-doc" id="demo-1098e" onclick="addDemoDoc('1098e')">
+          <div class="demo-doc-preview">
+            <div class="doc-page">
+              <div class="doc-header-bar"></div>
+              <div class="doc-form-id">1098-E</div>
+              <div class="doc-year">2025</div>
+              <div class="doc-title-text">Student Loan<br>Interest</div>
+              <div class="doc-line"></div>
+              <div class="doc-line short"></div>
+              <div class="doc-line"></div>
+            </div>
+          </div>
+          <div class="demo-doc-info">
+            <div class="demo-doc-title">Sample 1098-E</div>
+            <div class="demo-doc-subtitle">Your loan servicer's report of student loan interest paid</div>
+          </div>
+          <div class="demo-doc-check hidden" id="check-1098e">&#10003;</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn primary hidden" id="btn-extract" onclick="extractDocuments()">File My Taxes</button>
+      <button class="btn primary hidden" id="btn-demo-go" onclick="useDemoDocuments()">File My Taxes</button>
+    </div>
+
+    <div class="progress-bar hidden" id="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <div class="progress-text hidden" id="progress-text"></div>
+  </div>
+
+  <!-- Hidden form fields for filing status/dependents (auto-detected or defaulted) -->
+  <input type="hidden" id="filing-status" value="single">
+  <input type="hidden" id="dependents" value="0">
+
+  <!-- Step 2: Results -->
+  <div class="step hidden" id="step-2">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <h2>Your Form 1040</h2>
+    </div>
+
+    <div id="result-hero"></div>
+
+    <div class="btn-row">
+      <button class="btn primary" onclick="downloadPDF()">Download Form 1040 PDF</button>
+      <button class="btn" onclick="backToUpload()">Start Over</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" id="tab-optimizations" onclick="switchTab('optimizations')">How I Optimized Your Savings</button>
+      <button class="tab" id="tab-suggestions" onclick="switchTab('suggestions')">Suggestions</button>
+    </div>
+
+    <div id="panel-optimizations" class="tab-panel">
+      <div id="optimizations-list"></div>
+    </div>
+
+    <div id="panel-suggestions" class="tab-panel hidden">
+      <div id="suggestions-list"></div>
+    </div>
+  </div>
+
+  <!-- Privacy & Security Section -->
+  <div class="privacy-section" id="privacy-section">
+    <div class="privacy-header" onclick="togglePrivacy()">
+      <div class="privacy-title">
+        <div class="status-dot verified" id="attest-dot"></div>
+        <span>How Your Data Is Protected</span>
+      </div>
+      <span class="attestation-toggle" id="privacy-toggle">learn more</span>
+    </div>
+
+    <div class="privacy-body hidden" id="privacy-body">
+
+      <div class="privacy-card">
+        <div class="privacy-card-header">
+          <div class="privacy-icon-text">TEE</div>
+          <div>
+            <div class="privacy-card-title">Compute Enclave</div>
+            <div class="privacy-card-status active" id="status-compute">AMD SEV-SNP (verified)</div>
+          </div>
+        </div>
+        <p class="privacy-card-desc">This app is running inside a hardware-encrypted enclave on EigenCompute using AMD SEV-SNP. The server operator cannot read the enclave's memory. You can independently verify this deployment on-chain.</p>
+        <p class="privacy-card-desc" style="margin-top:8px"><a href="https://verify-sepolia.eigencloud.xyz/app/0xc757EC2cEB8a75d399E1C63C6284161522eD7a97" target="_blank" style="color:var(--accent-strong)">View verification on EigenCompute</a></p>
+      </div>
+
+      <div class="privacy-card">
+        <div class="privacy-card-header">
+          <div class="privacy-icon-text">RAM</div>
+          <div>
+            <div class="privacy-card-title">Data at Rest</div>
+            <div class="privacy-card-status active" id="status-rest">not stored</div>
+          </div>
+        </div>
+        <p class="privacy-card-desc">Nothing is saved. Your W-2 data, computed tax return, and Form 1040 exist only in the server's temporary working memory (RAM) while your request is being processed, similar to how a calculator forgets a number after you clear it. Nothing is ever written to a hard drive, a database, or a log file. Once your PDF is returned, the data is discarded. There is no account, no history, and no way for anyone to retrieve your information later.</p>
+      </div>
+
+      <div class="privacy-card">
+        <div class="privacy-card-header">
+          <div class="privacy-icon-text">TLS</div>
+          <div>
+            <div class="privacy-card-title">Data in Transit</div>
+            <div class="privacy-card-status active" id="status-transit">TLS encrypted</div>
+          </div>
+        </div>
+        <p class="privacy-card-desc">All data between your browser and the server is encrypted with TLS, the same encryption that protects your online banking. Your W-2 is scrambled before it leaves your device and unscrambled only at the destination. Normally, the server's operating system handles this unscrambling, which means the server operator could theoretically intercept it. When running inside EigenCompute, the unscrambling happens inside the hardware enclave itself, so the encrypted data passes through the server's network and operating system without ever being readable, and only becomes visible inside the protected enclave where your taxes are computed.</p>
+      </div>
+
+      <div class="privacy-card">
+        <div class="privacy-card-header">
+          <div class="privacy-icon-text">ID</div>
+          <div>
+            <div class="privacy-card-title">Deployment Verification</div>
+            <div class="privacy-card-status active">on-chain</div>
+          </div>
+        </div>
+        <p class="privacy-card-desc">This deployment is registered on the Ethereum Sepolia blockchain. The Docker image hash is recorded on-chain, so you can verify that the exact code running in the enclave matches what was deployed. No one can swap out the code without it being visible on-chain.</p>
+        <div class="attestation-grid" style="margin-top:10px">
+          <div class="attest-item"><div class="label">TEE Type</div><div class="value">AMD SEV-SNP (Confidential VM)</div></div>
+          <div class="attest-item"><div class="label">App ID</div><div class="value">0xc757EC2cEB8a75d399E1C63C6284161522eD7a97</div></div>
+          <div class="attest-item"><div class="label">Image</div><div class="value">docker.io/eigenmustafa/taxai:v3</div></div>
+          <div class="attest-item"><div class="label">Provider</div><div class="value">EigenCompute (Sepolia Testnet)</div></div>
+        </div>
+        <p class="privacy-card-desc" style="margin-top:8px"><a href="https://verify-sepolia.eigencloud.xyz/app/0xc757EC2cEB8a75d399E1C63C6284161522eD7a97" target="_blank" style="color:var(--accent-strong)">Verify on-chain</a></p>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    <p>TaxAI - Privacy-preserving AI tax filing</p>
+    <p style="margin-top:4px">
+      Compute: <a href="https://docs.eigencloud.xyz/eigencompute/get-started/eigencompute-overview" target="_blank">EigenCompute TEE</a>
+    </p>
+    <p style="margin-top:8px;color:var(--red)">NOT PRODUCTION READY. This is a proof of concept.</p>
+  </footer>
+
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
