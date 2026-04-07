@@ -250,13 +250,11 @@ Venice AI offers end-to-end encrypted inference. Prompts are encrypted before le
 - Venice AI: https://venice.ai/
 - Venice E2EE: https://venice.ai/blog/venice-launches-end-to-end-encrypted-ai
 
-**Option 2: Run open-source models locally inside the TEE**
+**Option 2: Run open-source models inside a GPU TEE**
 
-Instead of calling an external API, run inference directly inside the EigenCompute enclave. Download an open-source model (Llama 3, Qwen, Mistral) and run it locally. This eliminates external API calls entirely. All extraction and review happens inside the same TEE as the tax computation. No data ever leaves the enclave. This requires a larger instance (GPU or high-memory CPU for quantized models) but provides the strongest privacy guarantee since there is no second party involved at all.
+EigenCompute runs on CPU-based TEEs (AMD SEV-SNP, Intel TDX), which are great for application compute but cannot run LLM inference efficiently. To run an open-source model (Llama 3, Qwen, Mistral) privately, you would need a GPU-based TEE (such as NVIDIA H100 Confidential Computing). This eliminates external API calls entirely. All extraction and review happens inside hardware-encrypted memory. No data ever leaves the enclave. This provides the strongest privacy guarantee since there is no second party involved at all. GPU TEE providers are still emerging, but this is the direction the industry is heading.
 
-The code is already structured for either swap. The AI client in `app/services/ai.py` has a clean interface. Replace the `_claude_extract` and `_claude_review` functions with either Venice API calls or local model inference and the privacy story is complete.
-
-- EigenCompute: https://docs.eigencloud.xyz/eigencompute/get-started/eigencompute-overview
+The code is already structured for either swap. The AI client in `app/services/ai.py` has a clean interface. Replace the `_claude_extract` and `_claude_review` functions with either Venice API calls or local GPU TEE inference and the privacy story is complete.
 
 ---
 
